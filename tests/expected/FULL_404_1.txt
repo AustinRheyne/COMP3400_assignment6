@@ -1,0 +1,11 @@
+Received incoming request from 127.0.0.1
+GET Request for /non_existent.html using HTTP/1.1
+URI requested was: /non_existent.html
+
+++++++++++++++++++++++++++++
+Client received
+++++++++++++++++++++++++++++
+HTTP/1.1 404 Not Found
+Connection: close
+
+++++++++++++++++++++++++++++
