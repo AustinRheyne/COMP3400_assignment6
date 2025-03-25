@@ -31,6 +31,9 @@ setup_server (const char *protocol)
   // TODO: Set the hints fields for a TCP/IPv4 socket to be used as a
   // server. The hints struct is used by getaddrinfo() to determine if the
   // current system can be configured as a server for the requested protocol.
+  
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
 
   if (getaddrinfo (NULL, protocol, &hints, &server_list) != 0)
     return -1;
@@ -43,7 +46,6 @@ setup_server (const char *protocol)
     {
       if ((socketfd = socket (server->ai_family, server->ai_socktype, 0)) < 0)
         continue;
-
       // TODO: Set the socket options and bind it to the server->ai_addr.
       // You should set SO_REUSEADDR socket_option and SO_RCVTIMEO to the
       // timeout provided. You can adjust the timeout if desired; the first
@@ -53,14 +55,30 @@ setup_server (const char *protocol)
       // will continue, trying with the next addrinfo entry.
       int socket_option = -1;
       struct timeval timeout = { 10, 0 }; // 10.0 seconds
+      setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (const void *) &socket_option, sizeof(int));
+      
+      setsockopt(socketfd, IPPROTO_TCP, SO_RCVTIMEO, (const void *) &timeout, sizeof(timeout));
+      
+			if (bind(socketfd, server->ai_addr, server->ai_addrlen) == 0)
+					break;
+			else
+				{
+					close (socketfd);
+					socketfd = -1;
+				}
     }
-
+	
   // TODO: Free the server list and convert the socket to a server socket.
   // At this point, we either have a socket (socketfd > 0) or we don't
   // (socketfd == -1). Either way, we do not need the list of addrinfo
   // structs any more, so free them using freeaddrinfo(). If we do have
   // a socket, use listen() to convert it to a server socket.
-
+  
+  
+	freeaddrinfo(server_list);
+	if (socketfd != -1)
+		listen(socketfd, 5);
+		
   return socketfd;
 }
 
@@ -80,11 +98,20 @@ get_connection (int socketfd, int *connection)
   struct sockaddr_in address;
   memset (&address, 0, sizeof (address));
   socklen_t addresslen = sizeof (struct sockaddr_in);
-
+	
+	char received_message[addresslen+1];
+	read (socketfd, received_message, addresslen);
+	received_message[addresslen] = '\0';
   // TODO: Accept the connection request and return the specified values
   // described above.
+  *connection = accept (socketfd, (struct sockaddr *)&address, &addresslen);
+  if (*connection < 0)
+  	{
+  		close(socketfd);
+  		return NULL;
+  	}
   
-  return "";
+  return inet_ntoa (address.sin_addr);
 }
 
 /* Build the HTTP response for the requested URI and HTTP version. Don't
