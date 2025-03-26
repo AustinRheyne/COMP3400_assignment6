@@ -1,0 +1,24 @@
+--- outputs/FULL_root.txt	2025-03-25 22:52:09.498401313 -0400
++++ expected/FULL_root.txt	2020-03-24 00:53:17.000000000 -0400
+@@ -1,7 +1,21 @@
+ Received incoming request from 127.0.0.1
+ GET Request for /index.html using HTTP/1.0
++URI requested was: /index.html
+ 
+ ++++++++++++++++++++++++++++
+ Client received
+ ++++++++++++++++++++++++++++
++HTTP/1.0 200 OK
++Content-Type: text/html; charset=UTF-8
++Content-Length: 119
++
++<html>
++  <head>
++    <title>Success!</title>
++  </head>
++
++  <body>
++    <h2>It <i>really</i> works!</h2>
++  </body>
++</html>
+ ++++++++++++++++++++++++++++

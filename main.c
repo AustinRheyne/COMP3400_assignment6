@@ -21,6 +21,31 @@
 int cmdline (int, char **, char **);
 
 void
+testingSuite ()
+{
+	printf ("======================================\n");
+  printf ("PUBLIC\n");
+  printf ("  MIN build response header\n");
+  printf ("  Given uri=srv_root/index.html and version=HTTP/1.0,\n");
+  printf ("  build the response (contents ignored):\n\n");
+  printf ("    HTTP/1.0 200 OK\\r\\n\n");
+  printf ("    Content-Type: text/html; charset=UTF-8\\r\\n\n");
+  printf ("    Content-Length: 119\\r\\n\n");
+  printf ("    \\r\\n\n\n");
+  char *contents = NULL; // IGNORED
+  char *header = build_response ("srv_root/index.html", "HTTP/1.0",
+                                 &contents);
+  char *expected = "HTTP/1.0 200 OK\r\n"
+    "Content-Type: text/html; charset=UTF-8\r\n"
+    "Content-Length: 119\r\n"
+    "\r\n";
+  printf ("Recieved: %s | Expected: %s\n", header, expected);
+  free (header);
+  
+  exit(1);
+}
+
+void
 usage (void)
 {
   printf ("Usage: web [options]\n");
@@ -38,6 +63,9 @@ usage (void)
 int
 main (int argc, char **argv)
 {
+	// Comment out to run as normal
+	//testingSuite();
+
   char *protocol = "3456";
   if (cmdline (argc, argv, &protocol) < 0)
     {

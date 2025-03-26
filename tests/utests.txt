@@ -1,0 +1,50 @@
+Running suite(s): Default
+======================================
+PUBLIC
+  MIN build response header
+  Given uri=srv_root/index.html and version=HTTP/1.0,
+  build the response (contents ignored):
+
+    HTTP/1.0 200 OK\r\n
+    Content-Type: text/html; charset=UTF-8\r\n
+    Content-Length: 119\r\n
+    \r\n
+
+======================================
+PUBLIC
+  FULL build response header index
+  Given uri=srv_root/index.html and version=HTTP/1.0,
+  build the response:
+
+    HTTP/1.1 200 OK\r\n
+    Content-Type: text/html; charset=UTF-8\r\n
+    Content-Length: 119\r\n
+    \r\n
+
+  And set contents to:
+
+    <html>
+      <head>
+        <title>Success!</title>
+      </head>
+    
+      <body>
+        <h2>It <i>really</i> works!</h2>
+      </body>
+    </html>
+
+  WARNING: If this free() fails, it is because you did not
+  dynamically allocate and read in the file contents. Instead,
+  you still have a hard-coded contents string in build_response()
+  that needs replaced.
+66%: Checks: 3, Failures: 1, Errors: 0
+public.c:59:F:Public:FULL_build_response_header_v1:0: Assertion 'header == expected' failed: header == "HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Length: 119
+
+", expected == "HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Length: 119
+Connection: close
+
+"

@@ -1,0 +1,14 @@
+--- outputs/MIN_404.txt	2025-03-25 22:52:06.400465470 -0400
++++ expected/MIN_404.txt	2020-03-24 00:53:17.000000000 -0400
+@@ -1,7 +1,10 @@
+ Received incoming request from 127.0.0.1
+-GET Request for /index.html using HTTP/1.0
++GET Request for /non_existent.html using HTTP/1.0
++URI requested was: /non_existent.html
+ 
+ ++++++++++++++++++++++++++++
+ Client received
+ ++++++++++++++++++++++++++++
++HTTP/1.0 404 Not Found
++
+ ++++++++++++++++++++++++++++

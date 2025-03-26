@@ -134,47 +134,58 @@ get_connection (int socketfd, int *connection)
 char *
 build_response (char *uri, char *version, char **contents)
 {
-  // Open the file for reading and get the file size.
   int fd = open (uri, O_RDONLY);
   if (fd < 0)
     return NULL;
+  
   struct stat file_info;
   if (fstat (fd, &file_info) < 0)
     {
       close (fd);
       return NULL;
     }
+  
   size_t filesize = file_info.st_size;
 
-  // TODO: For FULL requirements, don't close the file this soon, as you
-  // will need to read in the file contents.
-  close (fd);
-
-  // TODO: Build the header by resizing and concatenating the strings as
-  // needed. See the sample code on the assignment description.
+  // Build the header
   char *header = strdup (version);
-  assert (header != NULL);
+  if (!header) return NULL;  // Check allocation
+  
   size_t headerlen = strlen (header);
   char *headers = " 200 OK\r\n"
     "Content-Type: text/html; charset=UTF-8\r\n"
     "Content-Length: ";
-  // Create a 21-character buffer to store the file size as a string (use
-  // snprintf() to convert the size_t into a char*). We can safely assume the
-  // string version while fit, as size_t is a 64-bit value that has a maximum
-  // value of 18,446,744,073,709,551,615.
-  char size_as_string[21];
-  memset (size_as_string, 0, 21);
-
-  // TODO: Reallocate the header pointer to append the file's size (as a
-  // content-length string) and the CRLF characters. Use the realloc-strncat
-  // model shown above. For FULL requirements, also append the
-  // "Connection: close\r\n" for HTTP/1.1 requests and the file contents.
-
-  // TODO: For FULL requirements, replace this string with the contents
-  // read in from the file:
-  *contents = "<html>\n  <head>\n    <title>Success!</title>\n"
-    "  </head>\n\n  <body>\n    <h2>It <i>really</i> "
-    "works!</h2>\n  </body>\n</html>\n";
   
-  return NULL;
+  headerlen += strlen(headers) + 1;
+  header = realloc(header, headerlen);
+  strncat(header, headers, strlen(headers));
+
+  // Convert file size to string
+  char size_as_string[21];
+  snprintf(size_as_string, sizeof(size_as_string), "%ld", filesize);
+
+  // Resize header again
+  headerlen += strlen(size_as_string) + 4;  // Extra space for "\r\n\r\n"
+  header = realloc(header, headerlen);
+   
+  
+  strncat(header, size_as_string, strlen(size_as_string));
+  strncat(header, "\r\n\r\n", 4);
+
+  // Allocate space for file contents
+  *contents = malloc(filesize + 1);
+
+  // Read file contents
+  if (read(fd, *contents, filesize) == -1)
+  {
+    free(header);
+    free(*contents);
+    close(fd);
+    return NULL;
+  }
+  
+  close(fd);
+
+  return header;  
 }
+
