@@ -34,7 +34,6 @@ setup_server (const char *protocol)
   
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE;
 
   if (getaddrinfo (NULL, protocol, &hints, &server_list) != 0)
     return -1;
