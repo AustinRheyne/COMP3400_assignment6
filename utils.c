@@ -34,6 +34,7 @@ setup_server (const char *protocol)
   
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE;
 
   if (getaddrinfo (NULL, protocol, &hints, &server_list) != 0)
     return -1;
@@ -53,7 +54,7 @@ setup_server (const char *protocol)
       // bind is successful, you should break out of this for-loop. Otherwise,
       // shutdown and close the socket and set socketfd back to -1; the loop
       // will continue, trying with the next addrinfo entry.
-      int socket_option = -1;
+      int socket_option = 1;
       struct timeval timeout = { 10, 0 }; // 10.0 seconds
       setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (const void *) &socket_option, sizeof(int));
       
@@ -163,14 +164,29 @@ build_response (char *uri, char *version, char **contents)
   // Convert file size to string
   char size_as_string[21];
   snprintf(size_as_string, sizeof(size_as_string), "%ld", filesize);
+	
 
+	
   // Resize header again
-  headerlen += strlen(size_as_string) + 4;  // Extra space for "\r\n\r\n"
+  headerlen += strlen(size_as_string) + 2;  // Extra space for "\r\n\r\n"
   header = realloc(header, headerlen);
-   
-  
   strncat(header, size_as_string, strlen(size_as_string));
-  strncat(header, "\r\n\r\n", 4);
+  strncat(header, "\r\n", 2);
+   
+  //add logic for HTTP/1.1 here- basically if it's HTTP/1.1 we need to add the connection:close at the end. Did it manually to pass tests
+	if (!strcmp(version, "HTTP/1.0"))
+		{
+  		headerlen += strlen(size_as_string) + 2;  // Extra space for "\r\n\r\n"
+  		header = realloc(header, headerlen);
+  		strncat(header, "\r\n", 2);
+  	}
+  	if (!strcmp(version, "HTTP/1.1"))
+		{
+			char *closedConnection = "Connection: close\r\n\r\n";
+			headerlen += strlen(closedConnection);
+			header = realloc(header, headerlen);
+			strncat(header, closedConnection, strlen(closedConnection));
+		}
 
   // Allocate space for file contents
   *contents = malloc(filesize + 1);

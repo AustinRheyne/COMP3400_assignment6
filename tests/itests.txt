@@ -1,9 +1,0 @@
-MIN_index                      FAIL (see outputs/MIN_index.diff for details)
-MIN_404                        FAIL (see outputs/MIN_404.diff for details)
-FULL_index_1                   FAIL (see outputs/FULL_index_1.diff for details)
-FULL_404_1                     FAIL (see outputs/FULL_404_1.diff for details)
-FULL_root                      FAIL (see outputs/FULL_root.diff for details)
-FULL_bootstrap                 FAIL (see outputs/FULL_bootstrap.diff for details)
-FULL_root_1                    FAIL (see outputs/FULL_root_1.diff for details)
-FULL_bootstrap_1               FAIL (see outputs/FULL_bootstrap_1.diff for details)
-No memory leak found.

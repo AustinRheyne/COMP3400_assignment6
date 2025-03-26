@@ -22,7 +22,10 @@ serve_web (char *protocol)
   // setup_server() to get the socket.
   int socketfd = setup_server (protocol);
   if (socketfd < 0)
+  	{
+  	printf("Socket failed!\n");
     return NULL;
+    }
 
   // Indicate (for debugging) that the server is running
   fprintf (stderr, "Server is started\n");
@@ -30,7 +33,11 @@ serve_web (char *protocol)
   int connection = -1;
   char *address = get_connection (socketfd, &connection);
   if (address == NULL)
+  	{
+  	printf("address is null?");
     return NULL;
+    }
+    
   printf ("Received incoming request from %s\n", address);
 
   // TODO: Read the request from the socket into the buffer provided above.
@@ -38,8 +45,15 @@ serve_web (char *protocol)
   // and return NULL.
   char buffer[BUFFER_SIZE];
   memset (&buffer, 0, BUFFER_SIZE);
-
-
+  
+  if (read(connection, buffer, BUFFER_SIZE) <= 0)
+  	{
+  		printf("Invalid read1\n");
+  		close (socketfd);
+  		close(connection);
+  		return NULL;
+  	}
+	
   // TODO: Look at the first line of the request to get the URI and the
   // HTTP version. For MIN: anything other than a GET request for
   // "/index.html" should be considered a non-existent file that will
@@ -52,8 +66,24 @@ serve_web (char *protocol)
   // with "\r", as you want to split the buffer at the carriage return.
   char *version = "HTTP/1.0";
   char *uri = "/index.html";
+  
+  char *current = strstr(buffer, uri);
+  
+  // if there is no /index.html
+  if (current == NULL)
+  	{
+  	close (socketfd);
+		close(connection);
+  	printf("No current!\n");
+  	return NULL;
+  	}
+  
+  
 
   printf ("GET Request for %s using %s\n", uri, version);
+  printf ("URI requested was: %s\n", uri);
+  
+  
 
   // Prepend "srv_root" to the beginnging of the URI to get the full
   // URI location, such as srv_root/index.html.
@@ -71,6 +101,21 @@ serve_web (char *protocol)
   //      "HTTP/1.0 404 Not Found\r\n\r\n";
   //      "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n";
 
+	if (header == NULL)
+		{
+			printf("Header is NULL!");
+			write (connection, "HTTP/1.0 404 Not Found\r\n\r\n", 29);
+		}
+	else
+		{
+			write (connection, header, strlen(header));
+			write (connection, contents, strlen(contents));
+		}
+	
+	close (socketfd);
+	close(connection);
+	free(header);
+	free(contents);
   // TODO: Free the headers and contents, shutdown and close both
   // sockets, return the URI of the request (possibly modified to
   // include "index.html", but not including the srv_root).

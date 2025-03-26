@@ -1,7 +1,0 @@
-Received incoming request from 127.0.0.1
-GET Request for /index.html using HTTP/1.0
-
-++++++++++++++++++++++++++++
-Client received
-++++++++++++++++++++++++++++
-++++++++++++++++++++++++++++
