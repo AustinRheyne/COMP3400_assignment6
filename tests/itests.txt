@@ -1,0 +1,9 @@
+MIN_index                      pass
+MIN_404                        pass
+FULL_index_1                   pass
+FULL_404_1                     FAIL (see outputs/FULL_404_1.diff for details)
+FULL_root                      FAIL (see outputs/FULL_root.diff for details)
+FULL_bootstrap                 pass
+FULL_root_1                    FAIL (see outputs/FULL_root_1.diff for details)
+FULL_bootstrap_1               pass
+No memory leak found.
