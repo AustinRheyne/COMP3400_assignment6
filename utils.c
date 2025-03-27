@@ -36,37 +36,39 @@ setup_server (const char *protocol)
   hints.ai_socktype = SOCK_STREAM;
 
   if (getaddrinfo (NULL, protocol, &hints, &server_list) != 0)
+  {
+  	printf("getaddrinfo Error");
     return -1;
-
+	}
   // Traverse through the server list, trying to create and bind a socket,
   // similar to how a client would work.
-  int socketfd = -1;
-  struct addrinfo *server = NULL;
-  for (server = server_list; server != NULL; server = server->ai_next)
-    {
-      if ((socketfd = socket (server->ai_family, server->ai_socktype, 0)) < 0)
-        continue;
-      // TODO: Set the socket options and bind it to the server->ai_addr.
-      // You should set SO_REUSEADDR socket_option and SO_RCVTIMEO to the
-      // timeout provided. You can adjust the timeout if desired; the first
-      // array element is seconds, and the second is milliseconds. If the
-      // bind is successful, you should break out of this for-loop. Otherwise,
-      // shutdown and close the socket and set socketfd back to -1; the loop
-      // will continue, trying with the next addrinfo entry.
-      int socket_option = 1;
-      struct timeval timeout = { 10, 0 }; // 10.0 seconds
-      setsockopt(socketfd, IPPROTO_TCP, SO_REUSEADDR, (const void *) &socket_option, sizeof(int));
-      
-      setsockopt(socketfd, IPPROTO_TCP, SO_RCVTIMEO, (const void *) &timeout, sizeof(timeout));
-      
-			if (bind(socketfd, server->ai_addr, server->ai_addrlen) == 0)
-					break;
-			else
-				{
-					close (socketfd);
-					socketfd = -1;
-				}
-    }
+  // Traverse through the server list, trying to create and bind a socket
+	int socketfd = -1;
+	struct addrinfo *server = NULL;
+
+	for (server = server_list; server != NULL; server = server->ai_next)
+	{
+		  // Create the socket
+		  if ((socketfd = socket(server->ai_family, server->ai_socktype, server->ai_protocol)) < 0)
+		      continue;
+
+		  // Set the socket options
+		  int socket_option = 1;
+		  struct timeval timeout = {10, 0}; // 10.0 seconds
+
+		  setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&socket_option, sizeof(int));
+		  setsockopt(socketfd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&timeout, sizeof(timeout));
+
+		  // Attempt to bind the socket
+		  if (bind(socketfd, server->ai_addr, server->ai_addrlen) == 0)
+		      break;
+
+		  // If bind fails, close the socket and reset socketfd
+		  shutdown(socketfd, SHUT_RDWR);
+		  close(socketfd);
+		  socketfd = -1;
+	}
+
 	
   // TODO: Free the server list and convert the socket to a server socket.
   // At this point, we either have a socket (socketfd > 0) or we don't

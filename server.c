@@ -64,22 +64,12 @@ serve_web (char *protocol)
   // pointer to "GET". Then, calling it as strtok (NULL, " "); would return
   // a pointer to the URI. For the third call, replace the second argument
   // with "\r", as you want to split the buffer at the carriage return.
-  char *version = "HTTP/1.0";
-  char *uri = "/index.html";
-  
-  char *current = strstr(buffer, uri);
-  
-  // if there is no /index.html
-  if (current == NULL)
-  	{
-  	close (socketfd);
-		close(connection);
-  	printf("No current!\n");
-  	return NULL;
-  	}
   
   
-
+  char *request = strtok(buffer, " ");
+  char *uri = strtok(NULL, " ");
+  char *version = strtok(NULL, "\r");
+ 
   printf ("GET Request for %s using %s\n", uri, version);
   printf ("URI requested was: %s\n", uri);
   
@@ -103,8 +93,10 @@ serve_web (char *protocol)
 
 	if (header == NULL)
 		{
-			printf("Header is NULL!");
-			write (connection, "HTTP/1.0 404 Not Found\r\n\r\n", 29);
+			if(!strcmp(version, "HTTP/1.0"))
+				write (connection, "HTTP/1.0 404 Not Found\r\n\r\n", 29);
+			else
+				write (connection, "HTTP/1.1 404 Not Found\r\nConnection: close\r\r\n", 38);
 		}
 	else
 		{
