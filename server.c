@@ -70,6 +70,12 @@ serve_web (char *protocol)
   char *uri = strtok(NULL, " ");
   char *version = strtok(NULL, "\r");
  
+ 	// If the requested URI is '/', update it to include /index.html
+ 	if(!strcmp(uri, "/"))
+ 	{
+ 		uri = realloc(uri, 11);
+ 		strcat(uri, "index.html");
+  }
   printf ("GET Request for %s using %s\n", uri, version);
   printf ("URI requested was: %s\n", uri);
   
@@ -96,7 +102,7 @@ serve_web (char *protocol)
 			if(!strcmp(version, "HTTP/1.0"))
 				write (connection, "HTTP/1.0 404 Not Found\r\n\r\n", 29);
 			else
-				write (connection, "HTTP/1.1 404 Not Found\r\nConnection: close\r\r\n", 38);
+				write (connection, "HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n", 48);
 		}
 	else
 		{

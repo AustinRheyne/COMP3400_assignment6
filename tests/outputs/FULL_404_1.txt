@@ -6,4 +6,6 @@ URI requested was: /non_existent.html
 Client received
 ++++++++++++++++++++++++++++
 HTTP/1.1 404 Not Found
-Connection: cl++++++++++++++++++++++++++++
+Connection: close
+
+++++++++++++++++++++++++++++
