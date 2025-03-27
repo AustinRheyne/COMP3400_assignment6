@@ -71,13 +71,17 @@ serve_web (char *protocol)
   char *version = strtok(NULL, "\r");
  
  	// If the requested URI is '/', update it to include /index.html
+ 
  	if(!strcmp(uri, "/"))
  	{
- 		uri = realloc(uri, 11);
- 		strcat(uri, "index.html");
+ 		//uri = realloc(uri, 11);
+ 		char *new_uri = malloc(12);
+ 		strcpy(new_uri, "/index.html");
+ 		uri = new_uri;
   }
-  printf ("GET Request for %s using %s\n", uri, version);
-  printf ("URI requested was: %s\n", uri);
+  	printf ("GET Request for %s using %s\n", uri, version);
+  	printf ("URI requested was: %s\n", uri);
+	
   
   
 
