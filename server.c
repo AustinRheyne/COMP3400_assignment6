@@ -74,7 +74,6 @@ serve_web (char *protocol)
  
  	if(!strcmp(uri, "/"))
  	{
- 		//uri = realloc(uri, 11);
  		char *new_uri = malloc(12);
  		strcpy(new_uri, "/index.html");
  		uri = new_uri;
